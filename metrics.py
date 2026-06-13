@@ -76,28 +76,19 @@ def compute_ar1_phi(log_returns: pd.DataFrame, window: int = 60) -> pd.DataFrame
 
     phi_df = pd.DataFrame(index=log_returns.index, columns=log_returns.columns)
 
-    # Loop through each ETF column
+    # Loop through each ETF column, computing a rolling AR(1) coefficient.
+    # We approximate phi with the rolling correlation between today's return and
+    # yesterday's return, which is the standardized version of the AR(1) slope.
     for col in log_returns.columns:
         series = log_returns[col]
-
-        # Build lagged data
         lagged = series.shift(1)
 
-        # Create a temporary DataFrame
-        temp = pd.DataFrame({
-            "r": series,
-            "lag": lagged
-        }).dropna()
+        temp = pd.DataFrame({"r": series, "lag": lagged}).dropna()
+        phi_df[col] = temp["r"].rolling(window).corr(temp["lag"])
 
-        # Now compute rolling phi
-        phi_vals = temp["r"].rolling(window).corr(temp["lag"])
-
-        # Save phi values back into dataframe
-        phi_df[col] = phi_vals
-
-        phi_df = phi_df.astype(float).fillna(0)
-        phi_df = phi_df.clip(-1, 1)
-
+    # Clean up once, after all columns are filled (this used to run inside the
+    # loop, redoing the whole frame on every ETF for no reason).
+    phi_df = phi_df.astype(float).fillna(0).clip(-1, 1)
     return phi_df
 
 
