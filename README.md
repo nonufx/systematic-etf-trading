@@ -1,4 +1,4 @@
-# Route Engine — a regime-aware ETF allocation model
+# Route Engine: a regime-aware ETF allocation model
 
 A daily, rules-based strategy that allocates capital across five liquid US ETFs
 (SPY, QQQ, IWM, XLF, XLI) using momentum, mean-reversion, volatility, and a
@@ -16,17 +16,17 @@ Each day the model scores every ETF and converts those scores into portfolio
 weights:
 
 1. **Log returns** are the base unit.
-2. **Momentum** — an EMA of recent log returns, also divided by volatility so the
+2. **Momentum**: an EMA of recent log returns, also divided by volatility so the
    signal favors trends that are strong *and* stable.
-3. **Mean reversion** — a rolling z-score; an ETF far below its recent average
+3. **Mean reversion**: a rolling z-score; an ETF far below its recent average
    scores as a bounce-back candidate.
-4. **Rolling Sharpe** — a confidence filter that rewards efficient recent returns.
-5. **Regime detection (AR(1) φ)** — a rolling autocorrelation of returns. When φ
+4. **Rolling Sharpe**: a confidence filter that rewards efficient recent returns.
+5. **Regime detection (AR(1) φ)**: a rolling autocorrelation of returns. When φ
    is positive, trends tend to persist, so the model leans on momentum; when
    negative, it leans on mean reversion.
-6. **Scoring** — signals are standardized *across the basket each day*
+6. **Scoring**: signals are standardized *across the basket each day*
    (cross-sectional), blended by regime, and adjusted by the Sharpe filter.
-7. **Weights** — positive scores are normalized into weights, capped at 45% per
+7. **Weights**: positive scores are normalized into weights, capped at 45% per
    ETF, blended toward an equal-weight baseline based on the overall regime, and
    smoothed day-to-day to keep turnover low. Returns are reported net of a
    10 bps transaction cost per unit of turnover.
@@ -36,7 +36,7 @@ weights:
 An earlier version standardized each ETF's signals over the *entire* sample,
 which leaks future information into past scores. The current code standardizes
 cross-sectionally (per day, across ETFs), so every score uses only information
-available at the time. Fixing this moved the Sharpe from 0.57 to 0.54 — small,
+available at the time. Fixing this moved the Sharpe from 0.57 to 0.54: small,
 which is reassuring, but the point-in-time number is the honest one.
 
 ## Results
@@ -66,10 +66,10 @@ Figures are written to `results/` when you run the model:
 
 ## Structure
 
-- `quant_route.py` — main pipeline: load data, build weights, backtest, plot
-- `metrics.py` — signal and feature engineering
-- `scoring.py` — cross-sectional composite scoring
-- `portfolio.py` — turnover, weight smoothing, transaction costs
+- `quant_route.py`: main pipeline: load data, build weights, backtest, plot
+- `metrics.py`: signal and feature engineering
+- `scoring.py`: cross-sectional composite scoring
+- `portfolio.py`: turnover, weight smoothing, transaction costs
 
 ## Running it
 
